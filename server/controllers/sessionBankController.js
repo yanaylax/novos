@@ -1,9 +1,10 @@
 const asyncHandler = require("express-async-handler");
 
 const Session = require("../models/sessionModel");
+const User = require("../models/userModel");
 
 const getSessionBank = asyncHandler(async (req, res) => {
-  const sessionBank = await Session.find();
+  const sessionBank = await Session.find({ user: req.user.id });
   res.status(200).json(sessionBank);
 });
 
@@ -24,6 +25,7 @@ const setSession = asyncHandler(async (req, res) => {
   const session = await Session.create({
     title: req.body.title,
     description: req.body.description,
+    user: req.user.id,
   });
   res.status(200).json(session);
 });
@@ -33,6 +35,18 @@ const deleteSession = asyncHandler(async (req, res) => {
   if (!session) {
     res.status(400);
     throw new Error("Session not found");
+  }
+
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    res.status(401);
+    throw new Error("User not found");
+  }
+
+  if (session.user.toString() !== user.id) {
+    res.status(401);
+    throw new Error("User not authorized");
   }
 
   await session.remove();
