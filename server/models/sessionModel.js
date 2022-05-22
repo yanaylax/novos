@@ -18,6 +18,12 @@ const sessionSchema = mongoose.Schema(
     inPlan: {
       type: Boolean,
     },
+    completed: {
+      type: Boolean,
+    },
+    index: {
+      type: Number,
+    },
   },
   {
     timestamps: true,

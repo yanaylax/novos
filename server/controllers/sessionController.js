@@ -20,6 +20,7 @@ const addSession = asyncHandler(async (req, res) => {
     description: req.body.description,
     index: req.body.index,
     inPlan: false,
+    completed: false,
     user: req.user.id,
   });
   res.status(200).json(session);
@@ -76,9 +77,16 @@ const deleteSession = asyncHandler(async (req, res) => {
   });
 });
 
+const clearTrainingPlan = asyncHandler(async (req, res) => {
+  await Session.updateMany({ user: req.user.id }, { $set: { inPlan: false } });
+  const sessions = await Session.find({ user: req.user.id });
+  res.status(200).json(sessions);
+});
+
 module.exports = {
   getSessions,
   addSession,
   deleteSession,
   updateSession,
+  clearTrainingPlan,
 };
